@@ -620,6 +620,62 @@ try{
 pintarTema();
 
 /* ---------- gatos ---------- */
+/* El maullido se sintetiza en el navegador: sin archivo de audio.
+   Diente de sierra con arco de tono ascendente-descendente, filtrado por dos
+   formantes que recorren /i/ -> /a/ -> /u/, que es lo que da el "miau". */
+let audio = null, clip = null;
+
+/* Reproduce la grabacion. Si el navegador la bloquea o falla, recurre a la
+   sintesis, para que el huevo de pascua nunca se quede mudo. */
+function maullar(retraso, tono){
+  try{
+    if(!clip){ clip = new Audio("datos/miau.mp3"); clip.preload = "auto"; }
+    const a = new Audio(clip.src);          /* instancia propia: pueden solaparse */
+    a.preservesPitch = a.mozPreservesPitch = a.webkitPreservesPitch = false;
+    a.playbackRate = tono;                  /* al no preservar el tono, cambia el timbre */
+    a.volume = 0.9;
+    setTimeout(() => { a.play().catch(() => sintetizar(0, tono)); }, retraso*1000);
+  }catch(e){ sintetizar(retraso, tono); }
+}
+
+function sintetizar(retraso, tono){
+  try{
+    if(!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
+    if(audio.state === "suspended") audio.resume();
+  }catch(e){ return; }
+
+  const t0 = audio.currentTime + retraso, dur = 0.55;
+  const osc = audio.createOscillator();
+  osc.type = "sawtooth";
+  osc.frequency.setValueAtTime(380*tono, t0);
+  osc.frequency.linearRampToValueAtTime(700*tono, t0 + dur*0.22);
+  osc.frequency.exponentialRampToValueAtTime(300*tono, t0 + dur);
+
+  const vib = audio.createOscillator(), vibG = audio.createGain();
+  vib.frequency.value = 22; vibG.gain.value = 12*tono;
+  vib.connect(vibG).connect(osc.frequency);
+
+  const mezcla = audio.createGain();
+  [[320,800,360,1],[2300,1250,760,0.5]].forEach(f => {
+    const bp = audio.createBiquadFilter();
+    bp.type = "bandpass"; bp.Q.value = 6;
+    bp.frequency.setValueAtTime(f[0], t0);
+    bp.frequency.linearRampToValueAtTime(f[1], t0 + dur*0.3);
+    bp.frequency.linearRampToValueAtTime(f[2], t0 + dur);
+    const g = audio.createGain(); g.gain.value = f[3];
+    osc.connect(bp).connect(g).connect(mezcla);
+  });
+
+  const salida = audio.createGain();
+  salida.gain.setValueAtTime(0.0001, t0);
+  salida.gain.exponentialRampToValueAtTime(0.22, t0 + 0.06);
+  salida.gain.setValueAtTime(0.22, t0 + dur*0.55);
+  salida.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  mezcla.connect(salida).connect(audio.destination);
+
+  osc.start(t0); vib.start(t0);
+  osc.stop(t0 + dur + 0.02); vib.stop(t0 + dur + 0.02);
+}
 let capaGatos = null, tempGatos, tempSalida;
 $("#miau").addEventListener("click", () => {
   clearTimeout(tempGatos); clearTimeout(tempSalida);
@@ -634,6 +690,8 @@ $("#miau").addEventListener("click", () => {
   }
   capaGatos.classList.remove("yendose");
   document.body.appendChild(capaGatos);
+  maullar(0, 1);        /* un maullido por gato, con tonos distintos */
+  maullar(0.62, 0.82);
   tempGatos = setTimeout(() => {
     capaGatos.classList.add("yendose");
     tempSalida = setTimeout(() => capaGatos.remove(), 350);
