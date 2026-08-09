@@ -2,196 +2,299 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#3E2A4E" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141018" media="(prefers-color-scheme: dark)">
 <title>Léxico de Friends · vocabulario por episodio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Gentium+Book+Plus:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=Gentium+Book+Plus:wght@400&display=swap" rel="stylesheet">
 <link rel="preload" as="fetch" href="datos/lexico.json" crossorigin>
 <style>
 :root{
-  --tinta:#231A2B; --ciruela:#412A4C; --ciruela-claro:#5E4270;
-  --papel:#F3F1F5; --tarjeta:#FFFFFF; --linea:#DED8E4;
-  --ambar:#C97A05; --verde:#1F6B4C; --tenue:#7C7188;
+  --fondo:#F4F2F7; --superficie:#FFFFFF; --superficie-2:#FAF8FC;
+  --tinta:#1E1723; --ciruela:#3E2A4E; --ciruela-viva:#6B4A82;
+  --acento:#B96E04; --verde:#186349; --tenue:#786D85; --linea:#E3DEE9;
+  --sombra:0 1px 2px rgba(30,23,35,.05), 0 8px 24px -12px rgba(30,23,35,.18);
+  --radio:14px;
   --display:"Bricolage Grotesque",system-ui,sans-serif;
-  --texto:"IBM Plex Sans",system-ui,sans-serif;
-  --dato:"IBM Plex Mono",ui-monospace,monospace;
+  --texto:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --dato:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
   --fonetica:"Gentium Book Plus","Charis SIL",Georgia,serif;
 }
+@media (prefers-color-scheme: dark){
+  :root{
+    --fondo:#131017; --superficie:#1C1723; --superficie-2:#221B2B;
+    --tinta:#EDE7F2; --ciruela:#2A1F36; --ciruela-viva:#C3A5D8;
+    --acento:#E7A63C; --verde:#5CC79A; --tenue:#9C90AA; --linea:#302739;
+    --sombra:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -14px rgba(0,0,0,.6);
+  }
+}
 *{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{background:var(--papel);color:var(--tinta);font-family:var(--texto);font-size:15px;line-height:1.5}
-header{background:var(--ciruela);color:#F6F1F8;padding:18px 22px}
-.cab{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap;max-width:1400px;margin:0 auto}
-h1{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.02em;margin:0}
-h1 span{font-weight:400;opacity:.65}
-.totales{font-family:var(--dato);font-size:12px;opacity:.7;margin-left:auto}
-.marco{max-width:1400px;margin:0 auto;padding:22px;display:grid;grid-template-columns:180px 1fr;gap:22px;align-items:start}
-@media(max-width:860px){.marco{grid-template-columns:1fr;padding:14px;gap:14px}}
-.temporadas{position:sticky;top:16px;display:flex;flex-direction:column;gap:4px}
-@media(max-width:860px){.temporadas{position:static;flex-direction:row;overflow-x:auto;padding-bottom:6px}}
-.temp{appearance:none;border:1px solid transparent;background:transparent;text-align:left;
-  padding:9px 12px;border-radius:8px;cursor:pointer;font:inherit;color:var(--tinta);
-  display:flex;justify-content:space-between;gap:10px;white-space:nowrap}
-.temp:hover{background:#E7E2EC}
-.temp[aria-current="true"]{background:var(--tinta);color:#F6F1F8}
-.temp b{font-family:var(--display);font-weight:600}
-.temp i{font-family:var(--dato);font-size:11px;font-style:normal;opacity:.6}
-.rejilla{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px;min-height:38px}
-.epi{width:42px;height:38px;border:1px solid var(--linea);background:var(--tarjeta);border-radius:7px;
-  cursor:pointer;font-family:var(--dato);font-size:12px;color:var(--tinta);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0;
-  transition:transform .12s ease}
-.epi u{text-decoration:none;font-size:9px;opacity:.5}
-.epi:hover{transform:translateY(-2px);border-color:var(--ciruela-claro)}
-.epi[aria-current="true"]{background:var(--tinta);color:#F6F1F8;border-color:var(--tinta)}
-.controles{background:var(--tarjeta);border:1px solid var(--linea);border-radius:12px;padding:14px;margin-bottom:16px}
-.fila{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.buscador{flex:1 1 260px;position:relative}
-.buscador input{width:100%;padding:10px 12px 10px 34px;border:1px solid var(--linea);border-radius:9px;font:inherit;background:var(--papel)}
-.buscador input:focus{outline:2px solid var(--ciruela-claro);outline-offset:1px}
-.buscador::before{content:"⌕";position:absolute;left:12px;top:8px;font-size:17px;color:var(--tenue)}
-select{padding:9px 10px;border:1px solid var(--linea);border-radius:9px;font:inherit;background:var(--papel)}
-.chip{appearance:none;border:1px solid var(--linea);background:var(--papel);border-radius:999px;
-  padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;color:var(--tinta)}
-.chip[aria-pressed="true"]{background:var(--tinta);color:#F6F1F8;border-color:var(--tinta)}
-.chip:focus-visible,.epi:focus-visible,.temp:focus-visible{outline:2px solid var(--ambar);outline-offset:2px}
-.panel{background:var(--tarjeta);border:1px solid var(--linea);border-radius:12px;overflow:hidden}
-.titulo{padding:14px 16px;border-bottom:1px solid var(--linea);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
-.titulo h2{font-family:var(--display);font-size:18px;margin:0;font-weight:600}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--fondo);color:var(--tinta);
+  font-family:var(--texto);font-size:clamp(14px,.35vw + 13px,16px);line-height:1.55;
+  -webkit-font-smoothing:antialiased}
+
+/* ---------- cabecera ---------- */
+.cabecera{position:sticky;top:0;z-index:30;background:var(--ciruela);color:#F7F2FA;
+  padding:12px max(16px,env(safe-area-inset-left)) 12px max(16px,env(safe-area-inset-right))}
+.cabecera-in{max-width:1320px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.marca{font-family:var(--display);font-weight:800;font-size:clamp(16px,1.4vw + 12px,21px);
+  letter-spacing:-.02em;margin:0;line-height:1.1}
+.marca span{font-weight:500;opacity:.6;display:block;font-size:.62em;letter-spacing:0}
+.totales{font-family:var(--dato);font-size:11px;opacity:.72;margin-left:auto;text-align:right}
+
+/* ---------- estructura ---------- */
+.marco{max-width:1320px;margin:0 auto;
+  padding:18px max(16px,env(safe-area-inset-left)) 60px max(16px,env(safe-area-inset-right));
+  display:grid;gap:20px;grid-template-columns:1fr}
+@media (min-width:1024px){
+  .marco{grid-template-columns:186px minmax(0,1fr);align-items:start;gap:26px}
+}
+
+/* ---------- temporadas ---------- */
+.temporadas{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+.temporadas::-webkit-scrollbar{display:none}
+@media (min-width:1024px){
+  .temporadas{position:sticky;top:74px;flex-direction:column;overflow:visible;gap:2px}
+}
+.temp{flex:0 0 auto;scroll-snap-align:start;appearance:none;border:1px solid var(--linea);
+  background:var(--superficie);color:var(--tinta);border-radius:999px;
+  padding:8px 14px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap;
+  display:flex;align-items:center;gap:8px;transition:background .15s,color .15s,border-color .15s}
+@media (min-width:1024px){
+  .temp{border-radius:10px;justify-content:space-between;padding:9px 12px;border-color:transparent;
+    background:transparent}
+  .temp:hover{background:var(--superficie)}
+}
+.temp b{font-family:var(--display);font-weight:700}
+.temp i{font-family:var(--dato);font-size:11px;font-style:normal;opacity:.55}
+.temp[aria-current="true"]{background:var(--tinta);color:var(--fondo);border-color:var(--tinta)}
+.temp[aria-current="true"] i{opacity:.75}
+
+/* ---------- rejilla de episodios ---------- */
+.rejilla{display:grid;gap:6px;margin-bottom:16px;
+  grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+@media (min-width:600px){.rejilla{grid-template-columns:repeat(auto-fill,minmax(52px,1fr))}}
+.epi{position:relative;overflow:hidden;aspect-ratio:1/.86;min-height:44px;
+  border:1px solid var(--linea);background:var(--superficie);border-radius:11px;cursor:pointer;
+  color:var(--tinta);font-family:var(--dato);font-size:13px;padding:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  transition:transform .14s cubic-bezier(.2,.8,.3,1),border-color .14s,box-shadow .14s}
+.epi .relleno{position:absolute;inset:auto 0 0 0;background:var(--ciruela-viva);opacity:.13}
+.epi span,.epi u{position:relative}
+.epi u{text-decoration:none;font-size:9.5px;opacity:.5}
+.epi:hover{transform:translateY(-2px);border-color:var(--ciruela-viva);box-shadow:var(--sombra)}
+.epi[aria-current="true"]{background:var(--tinta);color:var(--fondo);border-color:var(--tinta)}
+.epi[aria-current="true"] .relleno{background:var(--acento);opacity:.5}
+
+/* ---------- barra de controles ---------- */
+.controles{position:sticky;top:66px;z-index:20;margin:0 -4px 16px;padding:10px 4px;
+  background:var(--fondo)}
+@media (min-width:760px){
+  .controles{background:color-mix(in srgb,var(--fondo) 88%,transparent);backdrop-filter:blur(12px)}
+}
+@supports not (backdrop-filter:blur(1px)){.controles{background:var(--fondo)}}
+.fila{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.buscador{flex:1 1 100%;position:relative;order:-1}
+@media (min-width:600px){.buscador{flex:1 1 240px;order:0}}
+.buscador input{width:100%;min-height:44px;padding:10px 14px 10px 40px;border:1px solid var(--linea);
+  border-radius:12px;font:inherit;background:var(--superficie);color:var(--tinta);box-shadow:var(--sombra)}
+.buscador input::placeholder{color:var(--tenue)}
+.buscador input:focus{outline:2px solid var(--ciruela-viva);outline-offset:1px;border-color:transparent}
+.buscador::before{content:"⌕";position:absolute;left:14px;top:50%;transform:translateY(-52%);
+  font-size:19px;color:var(--tenue);pointer-events:none}
+select,.chip{min-height:40px;border:1px solid var(--linea);border-radius:999px;background:var(--superficie);
+  color:var(--tinta);font:inherit;font-size:13px;padding:0 14px;cursor:pointer}
+select{border-radius:12px;padding:0 10px}
+.chip[aria-pressed="true"]{background:var(--tinta);color:var(--fondo);border-color:var(--tinta)}
+.chip:focus-visible,.epi:focus-visible,.temp:focus-visible,select:focus-visible,.decir:focus-visible{
+  outline:2px solid var(--acento);outline-offset:2px}
+@media (pointer:coarse){select,.chip{min-height:44px}}
+
+/* ---------- panel de resultados ---------- */
+.panel{background:var(--superficie);border:1px solid var(--linea);border-radius:var(--radio);
+  box-shadow:var(--sombra);overflow:hidden}
+.titulo{padding:14px 16px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  border-bottom:1px solid var(--linea)}
+.titulo h2{font-family:var(--display);font-size:clamp(17px,1.1vw + 14px,20px);margin:0;font-weight:700}
 .titulo .sub{font-family:var(--dato);font-size:12px;color:var(--tenue)}
-table{width:100%;border-collapse:collapse}
-th{font-family:var(--dato);font-size:11px;text-transform:uppercase;letter-spacing:.06em;
-  color:var(--tenue);text-align:left;padding:9px 16px;border-bottom:1px solid var(--linea);font-weight:500}
-td{padding:10px 16px;border-bottom:1px solid #EFEBF2;vertical-align:top}
-tbody tr:hover{background:#FAF8FB}
-.lema{font-weight:600;font-size:16px}
-.pos{font-family:var(--dato);font-size:11px;color:var(--tenue)}
-.ipa{font-family:var(--fonetica);font-size:15px;color:var(--ciruela-claro);white-space:nowrap}
-.es{color:var(--verde)}
+
+/* rejilla de entradas: tabla en pantallas anchas, tarjetas en móvil */
+.encabezados{display:none}
+@media (min-width:760px){
+  .encabezados,.entrada{display:grid;
+    grid-template-columns:minmax(170px,1.1fr) minmax(130px,.7fr) minmax(190px,1.5fr) 96px;
+    gap:16px;align-items:start}
+  .encabezados{padding:9px 16px;border-bottom:1px solid var(--linea)}
+  .encabezados span{font-family:var(--dato);font-size:10.5px;text-transform:uppercase;
+    letter-spacing:.07em;color:var(--tenue)}
+  .encabezados span:last-child,.c-frec{text-align:right}
+}
+.entrada{padding:12px 16px;border-bottom:1px solid var(--linea)}
+.entrada:last-child{border-bottom:0}
+@media (hover:hover){.entrada:hover{background:var(--superficie-2)}}
+.lema{font-family:var(--display);font-weight:700;font-size:clamp(16px,.6vw + 15px,18px);
+  letter-spacing:-.01em;margin:0 6px 0 0;display:inline}
+.pos{font-family:var(--dato);font-size:10.5px;color:var(--tenue);text-transform:lowercase}
+.c-ipa{display:flex;align-items:center;gap:8px;margin-top:2px}
+@media (min-width:760px){.c-ipa{margin-top:0}}
+.ipa{font-family:var(--fonetica);font-size:16px;color:var(--ciruela-viva)}
+.es{color:var(--verde);font-weight:500}
 .nota{display:block;font-size:12px;color:var(--tenue);margin-top:2px}
-.marca{display:inline-block;font-family:var(--dato);font-size:10px;text-transform:uppercase;
-  letter-spacing:.04em;padding:2px 6px;border-radius:5px;margin-left:6px;vertical-align:2px}
-.m-nueva{background:#E8F1EC;color:var(--verde)}
-.m-col{background:#FBF0DC;color:var(--ambar)}
-.m-ext{background:#EDE7F3;color:var(--ciruela-claro)}
-.num{font-family:var(--dato);font-size:13px;text-align:right;white-space:nowrap}
-.decir{appearance:none;border:1px solid var(--linea);background:var(--tarjeta);
-  width:26px;height:26px;border-radius:50%;cursor:pointer;color:var(--ciruela-claro);
-  font-size:13px;line-height:1;padding:0;margin-left:8px;vertical-align:1px;
-  transition:background .12s ease,color .12s ease}
-.decir:hover{background:var(--ciruela);color:#F6F1F8;border-color:var(--ciruela)}
-.decir:focus-visible{outline:2px solid var(--ambar);outline-offset:2px}
-.decir[data-sonando="1"]{background:var(--ambar);color:#fff;border-color:var(--ambar)}
+.marca{display:inline-block;font-family:var(--dato);font-size:9.5px;text-transform:uppercase;
+  letter-spacing:.05em;padding:2px 7px;border-radius:6px;margin-right:5px;vertical-align:2px}
+.m-nueva{background:color-mix(in srgb,var(--verde) 15%,transparent);color:var(--verde)}
+.m-col{background:color-mix(in srgb,var(--acento) 16%,transparent);color:var(--acento)}
+.m-ext{background:color-mix(in srgb,var(--ciruela-viva) 18%,transparent);color:var(--ciruela-viva)}
+.c-frec{font-family:var(--dato);font-size:12.5px;color:var(--tenue);margin-top:6px}
+@media (min-width:760px){.c-frec{margin-top:2px}}
+.c-frec b{color:var(--tinta);font-weight:500;font-size:14px}
+.barra{display:block;height:3px;background:var(--acento);border-radius:2px;margin-top:5px;
+  min-width:3px;opacity:.7}
+@media (max-width:759px){.barra{display:none}}
+
+/* botón de pronunciación */
+.decir{flex:0 0 auto;appearance:none;border:1px solid var(--linea);background:var(--superficie-2);
+  width:32px;height:32px;border-radius:50%;cursor:pointer;color:var(--ciruela-viva);
+  font-size:11px;line-height:1;padding:0;display:grid;place-items:center;
+  transition:background .15s,color .15s,transform .1s}
+@media (pointer:coarse){.decir{width:40px;height:40px;font-size:13px}}
+.decir:hover{background:var(--ciruela-viva);color:var(--superficie);border-color:transparent}
+.decir:active{transform:scale(.92)}
+.decir[data-sonando="1"]{background:var(--acento);color:#fff;border-color:transparent}
 body.sin-voz .decir{display:none}
-.barra{display:block;height:3px;background:var(--ambar);border-radius:2px;margin-top:4px;min-width:2px;opacity:.75}
-.aviso{padding:48px 16px;text-align:center;color:var(--tenue)}
-.aviso b{display:block;color:var(--tinta);font-weight:600;margin-bottom:6px}
-.aviso code{font-family:var(--dato);font-size:13px;background:var(--papel);padding:2px 6px;border-radius:5px}
-.cargando{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ambar);
-  margin-right:7px;animation:latido 1s ease-in-out infinite}
-@keyframes latido{0%,100%{opacity:.25}50%{opacity:1}}
-footer{max-width:1400px;margin:0 auto;padding:8px 22px 40px;color:var(--tenue);font-size:12px}
+
+/* estados */
+.aviso{padding:52px 20px;text-align:center;color:var(--tenue)}
+.aviso b{display:block;color:var(--tinta);font-weight:600;margin-bottom:6px;font-size:16px}
+.aviso code{font-family:var(--dato);font-size:12.5px;background:var(--superficie-2);
+  padding:2px 6px;border-radius:6px}
+.esqueleto{padding:12px 16px;border-bottom:1px solid var(--linea)}
+.esqueleto i{display:block;height:13px;border-radius:6px;background:var(--linea);
+  animation:pulso 1.4s ease-in-out infinite}
+.esqueleto i+i{margin-top:8px;width:55%}
+@keyframes pulso{0%,100%{opacity:.45}50%{opacity:.9}}
+.centinela{height:1px}
+.mas{padding:16px;text-align:center;font-family:var(--dato);font-size:12px;color:var(--tenue)}
+.mas button{min-height:44px;padding:0 20px;border:1px solid var(--linea);border-radius:999px;
+  background:var(--superficie-2);color:var(--tinta);font:inherit;font-size:13px;cursor:pointer;
+  display:block;margin:8px auto 0}
+.mas button:hover{background:var(--tinta);color:var(--fondo);border-color:var(--tinta)}
+.pie{max-width:1320px;margin:0 auto;padding:0 20px 40px;color:var(--tenue);font-size:12px}
 kbd{font-family:var(--dato);font-size:11px;border:1px solid var(--linea);border-bottom-width:2px;
-  border-radius:4px;padding:1px 5px;background:var(--tarjeta)}
+  border-radius:5px;padding:1px 5px;background:var(--superficie)}
+@media (max-width:759px){.solo-ancho{display:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<header>
-  <div class="cab">
-    <h1>Léxico de Friends <span>· vocabulario por episodio</span></h1>
-    <div class="totales" id="totales"><span class="cargando"></span>cargando</div>
+
+<header class="cabecera">
+  <div class="cabecera-in">
+    <h1 class="marca">Léxico de Friends<span>vocabulario por episodio</span></h1>
+    <div class="totales" id="totales">cargando…</div>
   </div>
 </header>
 
 <div class="marco">
   <nav class="temporadas" id="temporadas" aria-label="Temporadas"></nav>
+
   <main>
     <div class="rejilla" id="rejilla" aria-label="Episodios"></div>
+
     <div class="controles">
       <div class="fila">
         <div class="buscador">
           <input id="q" type="search" placeholder="Buscar en inglés o español…"
-                 aria-label="Buscar palabra" autocomplete="off">
+                 aria-label="Buscar palabra" autocomplete="off" enterkeyhint="search">
         </div>
-        <select id="orden" aria-label="Ordenar">
-          <option value="frec">Más frecuentes primero</option>
+        <select id="orden" aria-label="Ordenar resultados">
+          <option value="frec">Más frecuentes</option>
           <option value="alfa">Alfabético</option>
-          <option value="total">Frecuencia en toda la serie</option>
+          <option value="total">Frecuencia en la serie</option>
         </select>
         <select id="cat" aria-label="Categoría gramatical">
-          <option value="">Todas las categorías</option>
+          <option value="">Todas</option>
           <option value="NOUN">Sustantivos</option>
           <option value="VERB">Verbos</option>
           <option value="ADJ">Adjetivos</option>
           <option value="ADV">Adverbios</option>
         </select>
-        <button class="chip" id="f-nuevas" aria-pressed="false">Solo nuevas</button>
+        <button class="chip" id="f-nuevas" aria-pressed="false">Nuevas</button>
         <button class="chip" id="f-col" aria-pressed="false">Coloquiales</button>
-        <button class="chip" id="f-ext" aria-pressed="false">Extranjerismos</button>
+        <button class="chip" id="f-ext" aria-pressed="false">Extranjeras</button>
       </div>
     </div>
-    <section class="panel">
-      <div class="titulo">
-        <h2 id="titulo">—</h2><span class="sub" id="subtitulo"></span>
+
+    <section class="panel" aria-live="polite">
+      <div class="titulo"><h2 id="titulo">—</h2><span class="sub" id="subtitulo"></span></div>
+      <div class="encabezados" aria-hidden="true">
+        <span>Palabra</span><span>Fonética</span><span>Español</span><span>Frecuencia</span>
       </div>
-      <div id="contenido"><p class="aviso"><span class="cargando"></span>Cargando el vocabulario…</p></div>
+      <div id="contenido">
+        <div class="esqueleto"><i></i><i></i></div>
+        <div class="esqueleto"><i></i><i></i></div>
+        <div class="esqueleto"><i></i><i></i></div>
+      </div>
+      <div class="centinela" id="centinela"></div>
     </section>
   </main>
 </div>
 
-<footer>
-  <kbd>←</kbd> <kbd>→</kbd> cambian de episodio · <kbd>/</kbd> va al buscador.
+<footer class="pie">
+  <span class="solo-ancho"><kbd>←</kbd> <kbd>→</kbd> cambian de episodio · <kbd>/</kbd> busca · </span>
   Filtro de vocabulario básico: Zipf ≤ 4,3.
 </footer>
 
 <script>
 const $ = s => document.querySelector(s);
 const [L_LEMA,L_POS,L_IPA,L_ES,L_STD,L_IDI,L_TOT] = [0,1,2,3,4,5,6];
-
-let EPS = [], LEX = [], DEBUT = [], DONDE = null;
-const cacheTemp = new Map();          /* temporada -> {episodio: [[lema,frec]]} */
-const estado = { ep:null, temp:1, q:"", orden:"frec", cat:"",
-                 nuevas:false, col:false, ext:false };
+const POR_TANDA = 60;
+const TOPE_AUTO = 300;          /* a partir de aqui hace falta pulsar: evita
+                                   acumular decenas de miles de nodos en el DOM */
+const COMPARAR = new Intl.Collator("es").compare;
 
 const IDIOMAS = {frances:"fr-FR", italiano:"it-IT", aleman:"de-DE", espanol:"es-ES"};
 const sintesis = window.speechSynthesis;
 let voces = [];
 function cargarVoces(){ voces = sintesis ? sintesis.getVoices() : []; }
-if(sintesis){
-  cargarVoces();
-  sintesis.addEventListener?.("voiceschanged", cargarVoces);
-} else {
-  document.body.classList.add("sin-voz");   /* sin soporte, se ocultan los botones */
-}
+if(sintesis){ cargarVoces(); sintesis.addEventListener?.("voiceschanged", cargarVoces); }
+else { document.body.classList.add("sin-voz"); }
 
 function pronunciar(palabra, idioma, boton){
   if(!sintesis) return;
   sintesis.cancel();
   const frase = new SpeechSynthesisUtterance(palabra);
-  frase.lang = idioma;
-  frase.rate = 0.9;
+  frase.lang = idioma; frase.rate = 0.9;
   const raiz = idioma.slice(0,2);
   const voz = voces.find(v => v.lang === idioma) || voces.find(v => v.lang.startsWith(raiz));
   if(voz) frase.voice = voz;
   if(boton){
     boton.dataset.sonando = "1";
-    frase.onend = frase.onerror = () => delete boton.dataset.sonando;
+    frase.onend = frase.onerror = () => { delete boton.dataset.sonando; };
   }
   sintesis.speak(frase);
 }
+
+let EPS = [], LEX = [], DEBUT = [], DONDE = null;
+const cacheTemp = new Map();
+const estado = { ep:null, temp:1, q:"", orden:"frec", cat:"",
+                 nuevas:false, col:false, ext:false };
+let visibles = [], pintadas = 0, topeFrec = 1;
 
 const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 async function traer(ruta){
   const r = await fetch(ruta);
-  if(!r.ok) throw new Error(`${ruta} respondió ${r.status}`);
+  if(!r.ok) throw new Error(ruta + " respondió " + r.status);
   return r.json();
 }
-
 async function temporada(t){
-  if(!cacheTemp.has(t)) cacheTemp.set(t, await traer(`datos/t${String(t).padStart(2,"0")}.json`));
+  if(!cacheTemp.has(t)) cacheTemp.set(t, await traer("datos/t" + String(t).padStart(2,"0") + ".json"));
   return cacheTemp.get(t);
 }
 
@@ -203,12 +306,11 @@ function pintarTemporadas(){
     const b = document.createElement("button");
     b.className="temp"; b.type="button";
     b.setAttribute("aria-current", t===estado.temp);
-    b.innerHTML = `<b>Temporada ${t}</b><i>${deT.length}</i>`;
+    b.innerHTML = "<b>T" + t + "</b><i>" + deT.length + "</i>";
     b.onclick = () => irA(deT[0].id);
     cont.appendChild(b);
   }
 }
-
 function pintarRejilla(){
   const cont = $("#rejilla"); cont.innerHTML = "";
   const maxC = Math.max(...EPS.map(e=>e.c));
@@ -216,138 +318,195 @@ function pintarRejilla(){
     const b = document.createElement("button");
     b.className="epi"; b.type="button";
     b.setAttribute("aria-current", e.id===estado.ep);
-    b.title = `${e.id} · ${e.c} palabras`;
-    const d = 0.45 + 0.55*(e.c/maxC);
-    b.innerHTML = `<span style="opacity:${d.toFixed(2)}">${String(e.n).padStart(2,"0")}</span><u>${e.c}</u>`;
+    b.setAttribute("aria-label", e.id + ", " + e.c + " palabras");
+    b.title = e.id + " · " + e.c + " palabras";
+    /* la altura del relleno codifica cuánto vocabulario aporta el episodio */
+    const alto = Math.round(100*e.c/maxC);
+    b.innerHTML = '<span class="relleno" style="height:' + alto + '%"></span>' +
+                  "<span>" + String(e.n).padStart(2,"0") + "</span><u>" + e.c + "</u>";
     b.onclick = () => irA(e.id);
     cont.appendChild(b);
   });
 }
-
 async function irA(id){
   estado.ep = id;
   estado.temp = EPS.find(e=>e.id===id).t;
-  location.hash = id;
+  history.replaceState(null, "", "#" + id);
   pintarTemporadas(); pintarRejilla();
-  await pintarTabla();
+  await refrescar();
 }
 
-/* ---------- tabla ---------- */
-async function filasVisibles(){
+/* ---------- selección de filas ---------- */
+async function calcular(){
   const q = estado.q.trim().toLowerCase();
   let base;
   if(q){
-    /* las ubicaciones solo se descargan la primera vez que se busca */
     if(!DONDE) DONDE = await traer("datos/ubicaciones.json");
     base = [];
     for(let i=0;i<LEX.length;i++){
       const L = LEX[i];
       if(L[L_LEMA].includes(q) || L[L_ES].toLowerCase().includes(q))
-        base.push({i, f:L[L_TOT], eps:DONDE[i].map(k=>EPS[k].id)});
+        base.push({i, f:L[L_TOT], eps:DONDE[i]});
     }
   } else {
     const datos = await temporada(estado.temp);
-    base = (datos[estado.ep]||[]).map(([i,f])=>({i,f,eps:null}));
+    base = (datos[estado.ep]||[]).map(par => ({i:par[0], f:par[1], eps:null}));
   }
   const posEp = EPS.findIndex(e=>e.id===estado.ep);
-  return base.filter(({i})=>{
-    const L = LEX[i];
+  return base.filter(o => {
+    const L = LEX[o.i];
     if(estado.cat && L[L_POS]!==estado.cat) return false;
     if(estado.col && !L[L_STD]) return false;
     if(estado.ext && !L[L_IDI]) return false;
-    if(estado.nuevas && DEBUT[i]!==posEp) return false;
+    if(estado.nuevas && DEBUT[o.i]!==posEp) return false;
     return true;
   }).sort((a,b)=>{
-    if(estado.orden==="alfa")  return LEX[a.i][L_LEMA].localeCompare(LEX[b.i][L_LEMA]);
+    if(estado.orden==="alfa")  return COMPARAR(LEX[a.i][L_LEMA], LEX[b.i][L_LEMA]);
     if(estado.orden==="total") return LEX[b.i][L_TOT]-LEX[a.i][L_TOT];
-    return b.f-a.f || LEX[a.i][L_LEMA].localeCompare(LEX[b.i][L_LEMA]);
+    return b.f-a.f || COMPARAR(LEX[a.i][L_LEMA], LEX[b.i][L_LEMA]);
   });
 }
 
-async function pintarTabla(){
-  const q = estado.q.trim();
-  let filas;
-  try { filas = await filasVisibles(); }
-  catch(err){
-    $("#contenido").innerHTML = `<p class="aviso"><b>No se pudieron cargar los datos</b>
-      ${esc(err.message)}. Comprueba que la carpeta <code>datos/</code> esté junto al HTML.</p>`;
-    return;
-  }
-  const ep = EPS.find(e=>e.id===estado.ep);
-  $("#titulo").textContent = q ? `Resultados de “${q}”` : ep.id;
-  $("#subtitulo").textContent = q
-      ? `${filas.length} palabra${filas.length===1?"":"s"} en las 10 temporadas`
-      : `${filas.length} de ${ep.c} palabras · temporada ${ep.t}, episodio ${ep.n}`;
+function entrada(o, posEp, maxF, buscando){
+  const L = LEX[o.i];
+  const marcas =
+    (DEBUT[o.i]===posEp && !buscando ? '<span class="marca m-nueva">nueva</span>' : "") +
+    (L[L_STD] ? '<span class="marca m-col">coloquial</span>' : "") +
+    (L[L_IDI] ? '<span class="marca m-ext">' + esc(L[L_IDI]) + "</span>" : "");
+  const nota  = L[L_STD] ? '<span class="nota">forma estándar: ' + esc(L[L_STD]) + "</span>" : "";
+  const donde = o.eps
+    ? '<span class="nota">' + o.eps.slice(0,5).map(k=>EPS[k].id).join(" · ") +
+      (o.eps.length>5 ? " +" + (o.eps.length-5) : "") + "</span>"
+    : "";
+  const cifra = buscando
+    ? "<b>" + o.f + "</b> en la serie"
+    : "<b>" + o.f + "</b> aquí · " + L[L_TOT] + " total";
+  return '<article class="entrada">' +
+    "<div>" + marcas + '<h3 class="lema">' + esc(L[L_LEMA]) + "</h3>" +
+      '<span class="pos">' + L[L_POS].toLowerCase() + "</span>" + donde + "</div>" +
+    '<div class="c-ipa"><span class="ipa">' + esc(L[L_IPA]) + "</span>" +
+      '<button class="decir" type="button" data-p="' + esc(L[L_LEMA]) + '" data-l="' +
+      (IDIOMAS[L[L_IDI]] || "en-US") + '" aria-label="Escuchar ' + esc(L[L_LEMA]) +
+      '" title="Escuchar">&#9654;</button></div>' +
+    '<div><span class="es">' + (esc(L[L_ES]) || "—") + "</span>" + nota + "</div>" +
+    '<div class="c-frec">' + cifra +
+      '<span class="barra" style="width:' + Math.max(4, Math.round(100*o.f/maxF)) + '%"></span></div>' +
+    "</article>";
+}
 
-  if(!filas.length){
-    $("#contenido").innerHTML = `<p class="aviso"><b>Ningún resultado</b>
-      Prueba a quitar algún filtro o a buscar otra palabra.</p>`;
+function pintarTanda(forzado){
+  if(pintadas >= visibles.length) return;
+  if(!forzado && pintadas >= TOPE_AUTO){ avisoFinal(); return; }
+  const buscando = estado.q.trim() !== "";
+  const posEp = EPS.findIndex(e=>e.id===estado.ep);
+  /* el maximo se calcula sobre todo el conjunto: con orden alfabetico
+     el primer elemento no es el mas frecuente */
+  const trozo = visibles.slice(pintadas, pintadas + POR_TANDA);
+  const cont = $("#contenido");
+  cont.insertAdjacentHTML("beforeend",
+    trozo.map(o => entrada(o, posEp, topeFrec, buscando)).join(""));
+  pintadas += trozo.length;
+  avisoFinal();
+}
+
+function avisoFinal(){
+  const cont = $("#contenido");
+  const previo = document.getElementById("mas");
+  if(previo) previo.remove();
+  if(pintadas >= visibles.length) return;
+  const resto = visibles.length - pintadas;
+  const texto = pintadas + " de " + visibles.length;
+  cont.insertAdjacentHTML("beforeend", pintadas >= TOPE_AUTO
+    ? '<p class="mas" id="mas">' + texto +
+      '<button type="button" id="cargar-mas">Mostrar ' + Math.min(resto, POR_TANDA) +
+      " más</button></p>"
+    : '<p class="mas" id="mas">' + texto + " · sigue bajando</p>");
+}
+
+async function refrescar(){
+  const cont = $("#contenido");
+  try { visibles = await calcular(); }
+  catch(err){
+    cont.innerHTML = '<p class="aviso"><b>No se pudieron cargar los datos</b>' + esc(err.message) +
+      '. Comprueba que la carpeta <code>datos/</code> esté junto al HTML.</p>';
     return;
   }
-  const posEp = EPS.findIndex(e=>e.id===estado.ep);
-  const maxF = Math.max(...filas.map(f=>f.f));
-  $("#contenido").innerHTML = `<table><thead><tr>
-      <th>Palabra</th><th>Fonética</th><th>Español</th>
-      <th class="num">${q?"Total en la serie":"En el episodio"}</th><th class="num">Serie</th>
-    </tr></thead><tbody>${filas.map(({i,f,eps})=>{
-    const L = LEX[i];
-    const marcas =
-      (DEBUT[i]===posEp && !q ? '<span class="marca m-nueva">nueva</span>' : "") +
-      (L[L_STD] ? '<span class="marca m-col">coloquial</span>' : "") +
-      (L[L_IDI] ? `<span class="marca m-ext">${esc(L[L_IDI])}</span>` : "");
-    const nota  = L[L_STD] ? `<span class="nota">forma estándar: ${esc(L[L_STD])}</span>` : "";
-    const donde = eps ? `<span class="nota">${eps.slice(0,6).join(" · ")}${eps.length>6?" …":""}</span>` : "";
-    return `<tr>
-      <td><span class="lema">${esc(L[L_LEMA])}</span>${marcas}
-          <span class="nota pos">${L[L_POS]}</span>${donde}</td>
-      <td class="ipa">${esc(L[L_IPA])}<button class="decir" type="button"
-          data-p="${esc(L[L_LEMA])}" data-l="${IDIOMAS[L[L_IDI]]||"en-US"}"
-          aria-label="Escuchar ${esc(L[L_LEMA])}" title="Escuchar">&#9654;</button></td>
-      <td><span class="es">${esc(L[L_ES])||"—"}</span>${nota}</td>
-      <td class="num">${f}<span class="barra" style="width:${Math.max(6,100*f/maxF)}%"></span></td>
-      <td class="num">${L[L_TOT]}</td></tr>`;
-  }).join("")}</tbody></table>`;
+  const buscando = estado.q.trim() !== "";
+  const ep = EPS.find(e=>e.id===estado.ep);
+  $("#titulo").textContent = buscando ? "“" + estado.q.trim() + "”" : ep.id;
+  $("#subtitulo").textContent = buscando
+    ? visibles.length + (visibles.length===1 ? " palabra" : " palabras") + " en las 10 temporadas"
+    : visibles.length + " de " + ep.c + " palabras · T" + ep.t + " E" + ep.n;
+
+  topeFrec = Math.max(1, ...visibles.map(o => o.f));
+  cont.innerHTML = "";
+  pintadas = 0;
+  if(!visibles.length){
+    cont.innerHTML = '<p class="aviso"><b>Ningún resultado</b>' +
+      "Prueba a quitar algún filtro o a buscar otra palabra.</p>";
+    return;
+  }
+  pintarTanda();
 }
 
 /* ---------- eventos ---------- */
-$("#q").addEventListener("input", e => { estado.q = e.target.value; pintarTabla(); });
-$("#orden").addEventListener("change", e => { estado.orden = e.target.value; pintarTabla(); });
-$("#cat").addEventListener("change", e => { estado.cat = e.target.value; pintarTabla(); });
-[["#f-nuevas","nuevas"],["#f-col","col"],["#f-ext","ext"]].forEach(([sel,clave])=>{
-  $(sel).addEventListener("click", e => {
-    estado[clave] = !estado[clave];
-    e.currentTarget.setAttribute("aria-pressed", estado[clave]);
-    pintarTabla();
+let temporizador;
+$("#q").addEventListener("input", e => {
+  estado.q = e.target.value;
+  clearTimeout(temporizador);
+  temporizador = setTimeout(refrescar, 120);      /* evita recalcular en cada tecla */
+});
+$("#orden").addEventListener("change", e => { estado.orden = e.target.value; refrescar(); });
+$("#cat").addEventListener("change",   e => { estado.cat   = e.target.value; refrescar(); });
+[["#f-nuevas","nuevas"],["#f-col","col"],["#f-ext","ext"]].forEach(par => {
+  $(par[0]).addEventListener("click", e => {
+    estado[par[1]] = !estado[par[1]];
+    e.currentTarget.setAttribute("aria-pressed", estado[par[1]]);
+    refrescar();
   });
 });
 $("#contenido").addEventListener("click", e => {
   const b = e.target.closest(".decir");
-  if(b) pronunciar(b.dataset.p, b.dataset.l, b);
+  if(b){ pronunciar(b.dataset.p, b.dataset.l, b); return; }
+  if(e.target.closest("#cargar-mas")) pintarTanda(true);
 });
 document.addEventListener("keydown", e => {
-  if(e.target.tagName==="INPUT"||e.target.tagName==="SELECT"){ if(e.key==="Escape") e.target.blur(); return; }
+  if(e.target.tagName==="INPUT"||e.target.tagName==="SELECT"){
+    if(e.key==="Escape") e.target.blur();
+    return;
+  }
   if(e.key==="/"){ e.preventDefault(); $("#q").focus(); return; }
   const k = EPS.findIndex(x=>x.id===estado.ep);
   if(e.key==="ArrowRight" && k<EPS.length-1) irA(EPS[k+1].id);
   if(e.key==="ArrowLeft"  && k>0)            irA(EPS[k-1].id);
 });
+if("IntersectionObserver" in window){
+  new IntersectionObserver(entradas => {
+    if(entradas[0].isIntersecting) pintarTanda(false);
+  }, {rootMargin:"600px"}).observe($("#centinela"));
+}
+addEventListener("hashchange", () => {
+  const e = EPS.find(x=>x.id===location.hash.slice(1));
+  if(e && e.id!==estado.ep) irA(e.id);
+});
 
 /* ---------- arranque ---------- */
 (async () => {
   try {
-    const [eps, lex] = await Promise.all([traer("datos/episodios.json"), traer("datos/lexico.json")]);
-    EPS = eps; DEBUT = lex.d;
-    LEX = lex.l.split("\n").map(r => { const c = r.split("\t"); c[6] = +c[6]; return c; });
-    $("#totales").textContent =
-      `${LEX.length.toLocaleString("es")} palabras · ${EPS.length} episodios · 10 temporadas`;
+    const par = await Promise.all([traer("datos/episodios.json"), traer("datos/lexico.json")]);
+    EPS = par[0];
+    DEBUT = par[1].d;
+    LEX = par[1].l.split("\n").map(r => { const c = r.split("\t"); c[6] = +c[6]; return c; });
+    $("#totales").innerHTML = LEX.length.toLocaleString("es") + " palabras · " +
+      EPS.length + " episodios";
     const inicial = EPS.find(e=>e.id===location.hash.slice(1)) || EPS[0];
     await irA(inicial.id);
   } catch(err){
     $("#totales").textContent = "";
-    $("#contenido").innerHTML = `<p class="aviso"><b>No se pudieron cargar los datos</b>
-      ${esc(err.message)}.<br>Si has abierto el archivo con doble clic, el navegador bloquea
-      la lectura de <code>datos/</code>. Sirve la carpeta con
-      <code>python3 -m http.server</code> y entra en <code>localhost:8000</code>.</p>`;
+    $("#contenido").innerHTML = '<p class="aviso"><b>No se pudieron cargar los datos</b>' +
+      esc(err.message) + ".<br>Si has abierto el archivo con doble clic, el navegador bloquea " +
+      "la lectura de <code>datos/</code>. Sirve la carpeta con " +
+      "<code>python3 -m http.server</code> y entra en <code>localhost:8000</code>.</p>";
   }
 })();
 </script>
