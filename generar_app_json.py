@@ -111,7 +111,7 @@ body{margin:0;background:var(--fondo);color:var(--tinta);
 .cabecera{position:sticky;top:0;z-index:30;background:var(--ciruela);color:#F7F2FA;
   padding:16px max(16px,env(safe-area-inset-left)) 16px max(16px,env(safe-area-inset-right))}
 .cabecera-in{max-width:1320px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.marca{font-family:var(--display);font-weight:800;font-size:clamp(21px,1.7vw + 16px,30px);
+.marca{font-family:var(--display);font-weight:800;font-size:clamp(23px,1.8vw + 18px,32px);
   letter-spacing:-.02em;margin:0;line-height:1.15}
 .marca span{font-weight:500;opacity:.8;display:block;letter-spacing:0;line-height:1.3;
   font-family:var(--texto);font-size:clamp(13px,.35vw + 12px,15.5px)}
@@ -183,7 +183,18 @@ body{margin:0;background:var(--fondo);color:var(--tinta);
 select,.chip{min-height:40px;border:1px solid var(--linea);border-radius:999px;background:var(--superficie);
   color:var(--tinta);font:inherit;font-size:13px;padding:0 14px;cursor:pointer}
 select{border-radius:12px;padding:0 10px}
+/* Los filtros son conmutadores, no selectores: llevan un punto que se enciende.
+   Además parten de un fondo un punto más hundido, para que se lean como un grupo aparte. */
+.chip{display:inline-flex;align-items:center;gap:8px;padding:0 15px 0 12px;
+  background:var(--superficie-2);
+  transition:background .15s,border-color .15s,transform .1s}
+.chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;
+  opacity:.3;transition:opacity .15s,box-shadow .2s,background .15s}
+.chip:hover{border-color:var(--ciruela-viva)}
+.chip:active{transform:scale(.97)}
 .chip[aria-pressed="true"]{background:var(--tinta);color:var(--fondo);border-color:var(--tinta)}
+.chip[aria-pressed="true"]::before{opacity:1;background:var(--acento);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--acento) 26%,transparent)}
 .chip:focus-visible,.epi:focus-visible,.temp:focus-visible,select:focus-visible,.decir:focus-visible{
   outline:2px solid var(--acento);outline-offset:2px}
 @media (pointer:coarse){select,.chip{min-height:44px}}
@@ -277,6 +288,11 @@ body.sin-voz .decir{display:none}
   .gatos img,.gatos.yendose img{animation:none}
 }
 .pie{max-width:1320px;margin:0 auto;padding:0 20px 40px;color:var(--tenue);font-size:12px}
+.legal{margin-top:18px;padding-top:16px;border-top:1px solid var(--linea);
+  font-size:11.5px;line-height:1.65;max-width:78ch}
+.legal p{margin:0 0 8px}
+.legal p:last-child{margin-bottom:0;opacity:.75}
+.legal strong{color:var(--tinta);font-weight:600}
 kbd{font-family:var(--dato);font-size:11px;border:1px solid var(--linea);border-bottom-width:2px;
   border-radius:5px;padding:1px 5px;background:var(--superficie)}
 @media (max-width:759px){.solo-ancho{display:none}}
@@ -351,6 +367,22 @@ kbd{font-family:var(--dato);font-size:11px;border:1px solid var(--linea);border-
   <span class="solo-ancho"><kbd>←</kbd> <kbd>→</kbd> cambian de episodio · </span>
   Filtro de vocabulario básico: Zipf ≤ 4,3.
   <button class="miau" id="miau" type="button">miau</button>
+
+  <div class="legal">
+    <p><strong>Proyecto educativo sin ánimo de lucro.</strong> Friends y sus marcas asociadas
+    son propiedad de Warner Bros. Entertainment Inc. Este sitio no está afiliado a sus
+    titulares ni cuenta con su respaldo, y se publica con fines de estudio de idiomas.</p>
+
+    <p>Lo que se muestra son <strong>datos léxicos derivados</strong>: listas de palabras,
+    frecuencias de aparición, transcripción fonética y traducción. No se reproduce diálogo
+    ni fragmento alguno de los guiones, y el material no sustituye al visionado de la serie.</p>
+
+    <p>Elaborado a partir de transcripciones públicas de aficionados, el diccionario bilingüe
+    de Apertium (GPL), glosas de Wiktionary (CC BY-SA), CMUdict, espeak-ng, wordfreq y spaCy.
+    Las traducciones derivadas de Wiktionary se comparten bajo CC BY-SA 4.0.</p>
+
+    <p>Aviso orientativo; no constituye asesoramiento legal.</p>
+  </div>
 </footer>
 
 <script>
