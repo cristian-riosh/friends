@@ -55,8 +55,6 @@ pesos["episodios.json"] = escribir("episodios.json",
 plano = "\n".join("\t".join(str(c) for c in fila) for fila in lexico)
 pesos["lexico.json"] = escribir("lexico.json",
     {"l": plano, "d": [debut[i] for i in range(len(lexico))]})
-pesos["ubicaciones.json"] = escribir("ubicaciones.json",
-    [aparece[i] for i in range(len(lexico))])
 for t in range(1, 11):
     pesos[f"t{t:02d}.json"] = escribir(f"t{t:02d}.json", frec_temp[t])
 
@@ -69,6 +67,10 @@ HTML = r"""<!DOCTYPE html>
 <meta name="theme-color" content="#3E2A4E" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#141018" media="(prefers-color-scheme: dark)">
 <title>Léxico de Friends · vocabulario por episodio</title>
+<script>
+try{ var t = localStorage.getItem("tema");
+     if(t) document.documentElement.dataset.tema = t; }catch(e){}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=Gentium+Book+Plus:wght@400&display=swap" rel="stylesheet">
@@ -86,12 +88,18 @@ HTML = r"""<!DOCTYPE html>
   --fonetica:"Gentium Book Plus","Charis SIL",Georgia,serif;
 }
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-tema="claro"]){
     --fondo:#131017; --superficie:#1C1723; --superficie-2:#221B2B;
     --tinta:#EDE7F2; --ciruela:#2A1F36; --ciruela-viva:#C3A5D8;
     --acento:#E7A63C; --verde:#5CC79A; --tenue:#9C90AA; --linea:#302739;
     --sombra:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -14px rgba(0,0,0,.6);
   }
+}
+:root[data-tema="oscuro"]{
+  --fondo:#131017; --superficie:#1C1723; --superficie-2:#221B2B;
+  --tinta:#EDE7F2; --ciruela:#2A1F36; --ciruela-viva:#C3A5D8;
+  --acento:#E7A63C; --verde:#5CC79A; --tenue:#9C90AA; --linea:#302739;
+  --sombra:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -14px rgba(0,0,0,.6);
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -101,38 +109,49 @@ body{margin:0;background:var(--fondo);color:var(--tinta);
 
 /* ---------- cabecera ---------- */
 .cabecera{position:sticky;top:0;z-index:30;background:var(--ciruela);color:#F7F2FA;
-  padding:12px max(16px,env(safe-area-inset-left)) 12px max(16px,env(safe-area-inset-right))}
+  padding:16px max(16px,env(safe-area-inset-left)) 16px max(16px,env(safe-area-inset-right))}
 .cabecera-in{max-width:1320px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.marca{font-family:var(--display);font-weight:800;font-size:clamp(16px,1.4vw + 12px,21px);
-  letter-spacing:-.02em;margin:0;line-height:1.1}
-.marca span{font-weight:500;opacity:.6;display:block;font-size:.62em;letter-spacing:0}
-.totales{font-family:var(--dato);font-size:11px;opacity:.72;margin-left:auto;text-align:right}
+.marca{font-family:var(--display);font-weight:800;font-size:clamp(21px,1.7vw + 16px,30px);
+  letter-spacing:-.02em;margin:0;line-height:1.15}
+.marca span{font-weight:500;opacity:.8;display:block;letter-spacing:0;line-height:1.3;
+  font-family:var(--texto);font-size:clamp(13px,.35vw + 12px,15.5px)}
+.tema{appearance:none;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);
+  color:inherit;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:17px;
+  display:grid;place-items:center;padding:0;transition:background .15s}
+.tema:hover{background:rgba(255,255,255,.18)}
+.tema:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
+.totales{font-family:var(--dato);font-size:clamp(12px,.25vw + 11.5px,13.5px);opacity:.88;
+  margin-left:auto;text-align:right;line-height:1.4}
 
 /* ---------- estructura ---------- */
 .marco{max-width:1320px;margin:0 auto;
   padding:18px max(16px,env(safe-area-inset-left)) 60px max(16px,env(safe-area-inset-right));
   display:grid;gap:20px;grid-template-columns:1fr}
-@media (min-width:1024px){
-  .marco{grid-template-columns:186px minmax(0,1fr);align-items:start;gap:26px}
+@media (min-width:900px){
+  .marco{grid-template-columns:200px minmax(0,1fr);align-items:start;gap:26px}
 }
 
 /* ---------- temporadas ---------- */
 .temporadas{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
 .temporadas::-webkit-scrollbar{display:none}
-@media (min-width:1024px){
-  .temporadas{position:sticky;top:74px;flex-direction:column;overflow:visible;gap:2px}
+@media (min-width:900px){
+  .temporadas{position:sticky;top:90px;flex-direction:column;overflow:visible;gap:3px}
 }
 .temp{flex:0 0 auto;scroll-snap-align:start;appearance:none;border:1px solid var(--linea);
   background:var(--superficie);color:var(--tinta);border-radius:999px;
   padding:8px 14px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap;
   display:flex;align-items:center;gap:8px;transition:background .15s,color .15s,border-color .15s}
-@media (min-width:1024px){
-  .temp{border-radius:10px;justify-content:space-between;padding:9px 12px;border-color:transparent;
-    background:transparent}
+@media (min-width:900px){
+  .temp{border-radius:10px;justify-content:space-between;padding:11px 13px;font-size:14px;
+    border-color:transparent;background:transparent;width:100%}
   .temp:hover{background:var(--superficie)}
+  .larga{display:inline}
+  .corta{display:none}
 }
 .temp b{font-family:var(--display);font-weight:700}
+.larga{display:none}
+.corta{display:inline}
 .temp i{font-family:var(--dato);font-size:11px;font-style:normal;opacity:.55}
 .temp[aria-current="true"]{background:var(--tinta);color:var(--fondo);border-color:var(--tinta)}
 .temp[aria-current="true"] i{opacity:.75}
@@ -154,21 +173,13 @@ body{margin:0;background:var(--fondo);color:var(--tinta);
 .epi[aria-current="true"] .relleno{background:var(--acento);opacity:.5}
 
 /* ---------- barra de controles ---------- */
-.controles{position:sticky;top:66px;z-index:20;margin:0 -4px 16px;padding:10px 4px;
+.controles{position:sticky;top:78px;z-index:20;margin:0 -4px 16px;padding:10px 4px;
   background:var(--fondo)}
 @media (min-width:760px){
   .controles{background:color-mix(in srgb,var(--fondo) 88%,transparent);backdrop-filter:blur(12px)}
 }
 @supports not (backdrop-filter:blur(1px)){.controles{background:var(--fondo)}}
 .fila{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.buscador{flex:1 1 100%;position:relative;order:-1}
-@media (min-width:600px){.buscador{flex:1 1 240px;order:0}}
-.buscador input{width:100%;min-height:44px;padding:10px 14px 10px 40px;border:1px solid var(--linea);
-  border-radius:12px;font:inherit;background:var(--superficie);color:var(--tinta);box-shadow:var(--sombra)}
-.buscador input::placeholder{color:var(--tenue)}
-.buscador input:focus{outline:2px solid var(--ciruela-viva);outline-offset:1px;border-color:transparent}
-.buscador::before{content:"⌕";position:absolute;left:14px;top:50%;transform:translateY(-52%);
-  font-size:19px;color:var(--tenue);pointer-events:none}
 select,.chip{min-height:40px;border:1px solid var(--linea);border-radius:999px;background:var(--superficie);
   color:var(--tinta);font:inherit;font-size:13px;padding:0 14px;cursor:pointer}
 select{border-radius:12px;padding:0 10px}
@@ -246,6 +257,25 @@ body.sin-voz .decir{display:none}
   background:var(--superficie-2);color:var(--tinta);font:inherit;font-size:13px;cursor:pointer;
   display:block;margin:8px auto 0}
 .mas button:hover{background:var(--tinta);color:var(--fondo);border-color:var(--tinta)}
+.miau{appearance:none;border:1px dashed var(--linea);background:transparent;color:var(--tenue);
+  border-radius:999px;padding:5px 12px;font:inherit;font-size:11.5px;cursor:pointer;margin-left:8px;
+  opacity:.55;transition:opacity .15s,border-color .15s}
+.miau:hover{opacity:1;border-color:var(--acento);color:var(--acento)}
+.miau:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
+.gatos{position:fixed;inset:0;z-index:60;display:grid;place-items:center;pointer-events:none;
+  background:transparent}
+.gatos img{width:min(78vw,460px);height:auto;
+  filter:drop-shadow(0 18px 40px rgba(0,0,0,.35));
+  animation:asomar .45s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes asomar{
+  from{opacity:0;transform:translateY(28px) scale(.9) rotate(-3deg)}
+  to{opacity:1;transform:none}
+}
+.gatos.yendose img{animation:irse .35s ease-in both}
+@keyframes irse{ to{opacity:0;transform:translateY(18px) scale(.95)} }
+@media (prefers-reduced-motion:reduce){
+  .gatos img,.gatos.yendose img{animation:none}
+}
 .pie{max-width:1320px;margin:0 auto;padding:0 20px 40px;color:var(--tenue);font-size:12px}
 kbd{font-family:var(--dato);font-size:11px;border:1px solid var(--linea);border-bottom-width:2px;
   border-radius:5px;padding:1px 5px;background:var(--superficie)}
@@ -259,6 +289,7 @@ kbd{font-family:var(--dato);font-size:11px;border:1px solid var(--linea);border-
   <div class="cabecera-in">
     <h1 class="marca">Léxico de Friends<span>vocabulario por episodio</span></h1>
     <div class="totales" id="totales">cargando…</div>
+    <button class="tema" id="tema" type="button" aria-label="Cambiar tema" title="Cambiar tema"></button>
   </div>
 </header>
 
@@ -270,10 +301,6 @@ kbd{font-family:var(--dato);font-size:11px;border:1px solid var(--linea);border-
 
     <div class="controles">
       <div class="fila">
-        <div class="buscador">
-          <input id="q" type="search" placeholder="Buscar en inglés o español…"
-                 aria-label="Buscar palabra" autocomplete="off" enterkeyhint="search">
-        </div>
         <select id="orden" aria-label="Ordenar resultados">
           <option value="frec">Más frecuentes</option>
           <option value="alfa">Alfabético</option>
@@ -289,6 +316,19 @@ kbd{font-family:var(--dato);font-size:11px;border:1px solid var(--linea);border-
         <button class="chip" id="f-nuevas" aria-pressed="false">Nuevas</button>
         <button class="chip" id="f-col" aria-pressed="false">Coloquiales</button>
         <button class="chip" id="f-ext" aria-pressed="false">Extranjeras</button>
+        <select id="vel" aria-label="Velocidad de la pronunciación" title="Velocidad de la voz">
+          <option value="1">Voz normal</option>
+          <option value="0.8" selected>Voz pausada</option>
+          <option value="0.65">Voz muy lenta</option>
+        </select>
+        <select id="rep" aria-label="Repeticiones de la pronunciación" title="Repeticiones">
+          <option value="0" selected>Sin repetir</option>
+          <option value="1">Repetir 1 vez</option>
+          <option value="2">Repetir 2 veces</option>
+          <option value="3">Repetir 3 veces</option>
+          <option value="4">Repetir 4 veces</option>
+          <option value="5">Repetir 5 veces</option>
+        </select>
       </div>
     </div>
 
@@ -308,8 +348,9 @@ kbd{font-family:var(--dato);font-size:11px;border:1px solid var(--linea);border-
 </div>
 
 <footer class="pie">
-  <span class="solo-ancho"><kbd>←</kbd> <kbd>→</kbd> cambian de episodio · <kbd>/</kbd> busca · </span>
+  <span class="solo-ancho"><kbd>←</kbd> <kbd>→</kbd> cambian de episodio · </span>
   Filtro de vocabulario básico: Zipf ≤ 4,3.
+  <button class="miau" id="miau" type="button">miau</button>
 </footer>
 
 <script>
@@ -323,28 +364,47 @@ const COMPARAR = new Intl.Collator("es").compare;
 const IDIOMAS = {frances:"fr-FR", italiano:"it-IT", aleman:"de-DE", espanol:"es-ES"};
 const sintesis = window.speechSynthesis;
 let voces = [];
+let velocidad = 0.8;      /* por debajo de 0,6 el sintetizador distorsiona */
+let repeticiones = 0;     /* escuchas adicionales tras la primera */
+let tempVoz, tokenVoz = 0, botonActivo = null;
+const PAUSA = 480;        /* silencio entre repeticiones, en ms */
 function cargarVoces(){ voces = sintesis ? sintesis.getVoices() : []; }
 if(sintesis){ cargarVoces(); sintesis.addEventListener?.("voiceschanged", cargarVoces); }
 else { document.body.classList.add("sin-voz"); }
 
 function pronunciar(palabra, idioma, boton){
   if(!sintesis) return;
+  /* cancelar lo anterior: el token invalida las repeticiones ya programadas */
   sintesis.cancel();
-  const frase = new SpeechSynthesisUtterance(palabra);
-  frase.lang = idioma; frase.rate = 0.9;
+  clearTimeout(tempVoz);
+  if(botonActivo) delete botonActivo.dataset.sonando;
+  const miTurno = ++tokenVoz;
+  botonActivo = boton || null;
+  if(boton) boton.dataset.sonando = "1";
+
   const raiz = idioma.slice(0,2);
   const voz = voces.find(v => v.lang === idioma) || voces.find(v => v.lang.startsWith(raiz));
-  if(voz) frase.voice = voz;
-  if(boton){
-    boton.dataset.sonando = "1";
-    frase.onend = frase.onerror = () => { delete boton.dataset.sonando; };
-  }
-  sintesis.speak(frase);
+  let quedan = repeticiones;
+
+  const decir = () => {
+    if(miTurno !== tokenVoz) return;
+    const frase = new SpeechSynthesisUtterance(palabra);
+    frase.lang = idioma;
+    frase.rate = velocidad;
+    if(voz) frase.voice = voz;
+    frase.onend = frase.onerror = () => {
+      if(miTurno !== tokenVoz) return;
+      if(quedan > 0){ quedan--; tempVoz = setTimeout(decir, PAUSA); }
+      else if(boton){ delete boton.dataset.sonando; botonActivo = null; }
+    };
+    sintesis.speak(frase);
+  };
+  decir();
 }
 
-let EPS = [], LEX = [], DEBUT = [], DONDE = null;
+let EPS = [], LEX = [], DEBUT = [];
 const cacheTemp = new Map();
-const estado = { ep:null, temp:1, q:"", orden:"frec", cat:"",
+const estado = { ep:null, temp:1, orden:"frec", cat:"",
                  nuevas:false, col:false, ext:false };
 let visibles = [], pintadas = 0, topeFrec = 1;
 
@@ -368,7 +428,8 @@ function pintarTemporadas(){
     const b = document.createElement("button");
     b.className="temp"; b.type="button";
     b.setAttribute("aria-current", t===estado.temp);
-    b.innerHTML = "<b>T" + t + "</b><i>" + deT.length + "</i>";
+    b.innerHTML = '<b><span class="larga">Temporada </span><span class="corta">T</span>' +
+                  t + "</b><i>" + deT.length + "</i>";
     b.onclick = () => irA(deT[0].id);
     cont.appendChild(b);
   }
@@ -400,20 +461,8 @@ async function irA(id){
 
 /* ---------- selección de filas ---------- */
 async function calcular(){
-  const q = estado.q.trim().toLowerCase();
-  let base;
-  if(q){
-    if(!DONDE) DONDE = await traer("datos/ubicaciones.json");
-    base = [];
-    for(let i=0;i<LEX.length;i++){
-      const L = LEX[i];
-      if(L[L_LEMA].includes(q) || L[L_ES].toLowerCase().includes(q))
-        base.push({i, f:L[L_TOT], eps:DONDE[i]});
-    }
-  } else {
-    const datos = await temporada(estado.temp);
-    base = (datos[estado.ep]||[]).map(par => ({i:par[0], f:par[1], eps:null}));
-  }
+  const datos = await temporada(estado.temp);
+  const base = (datos[estado.ep] || []).map(par => ({i:par[0], f:par[1]}));
   const posEp = EPS.findIndex(e=>e.id===estado.ep);
   return base.filter(o => {
     const L = LEX[o.i];
@@ -429,23 +478,17 @@ async function calcular(){
   });
 }
 
-function entrada(o, posEp, maxF, buscando){
+function entrada(o, posEp, maxF){
   const L = LEX[o.i];
   const marcas =
-    (DEBUT[o.i]===posEp && !buscando ? '<span class="marca m-nueva">nueva</span>' : "") +
+    (DEBUT[o.i]===posEp ? '<span class="marca m-nueva">nueva</span>' : "") +
     (L[L_STD] ? '<span class="marca m-col">coloquial</span>' : "") +
     (L[L_IDI] ? '<span class="marca m-ext">' + esc(L[L_IDI]) + "</span>" : "");
   const nota  = L[L_STD] ? '<span class="nota">forma estándar: ' + esc(L[L_STD]) + "</span>" : "";
-  const donde = o.eps
-    ? '<span class="nota">' + o.eps.slice(0,5).map(k=>EPS[k].id).join(" · ") +
-      (o.eps.length>5 ? " +" + (o.eps.length-5) : "") + "</span>"
-    : "";
-  const cifra = buscando
-    ? "<b>" + o.f + "</b> en la serie"
-    : "<b>" + o.f + "</b> aquí · " + L[L_TOT] + " total";
+  const cifra = "<b>" + o.f + "</b> aquí · " + L[L_TOT] + " total";
   return '<article class="entrada">' +
     "<div>" + marcas + '<h3 class="lema">' + esc(L[L_LEMA]) + "</h3>" +
-      '<span class="pos">' + L[L_POS].toLowerCase() + "</span>" + donde + "</div>" +
+      '<span class="pos">' + L[L_POS].toLowerCase() + "</span></div>" +
     '<div class="c-ipa"><span class="ipa">' + esc(L[L_IPA]) + "</span>" +
       '<button class="decir" type="button" data-p="' + esc(L[L_LEMA]) + '" data-l="' +
       (IDIOMAS[L[L_IDI]] || "en-US") + '" aria-label="Escuchar ' + esc(L[L_LEMA]) +
@@ -459,14 +502,13 @@ function entrada(o, posEp, maxF, buscando){
 function pintarTanda(forzado){
   if(pintadas >= visibles.length) return;
   if(!forzado && pintadas >= TOPE_AUTO){ avisoFinal(); return; }
-  const buscando = estado.q.trim() !== "";
   const posEp = EPS.findIndex(e=>e.id===estado.ep);
   /* el maximo se calcula sobre todo el conjunto: con orden alfabetico
      el primer elemento no es el mas frecuente */
   const trozo = visibles.slice(pintadas, pintadas + POR_TANDA);
   const cont = $("#contenido");
   cont.insertAdjacentHTML("beforeend",
-    trozo.map(o => entrada(o, posEp, topeFrec, buscando)).join(""));
+    trozo.map(o => entrada(o, posEp, topeFrec)).join(""));
   pintadas += trozo.length;
   avisoFinal();
 }
@@ -493,32 +535,32 @@ async function refrescar(){
       '. Comprueba que la carpeta <code>datos/</code> esté junto al HTML.</p>';
     return;
   }
-  const buscando = estado.q.trim() !== "";
   const ep = EPS.find(e=>e.id===estado.ep);
-  $("#titulo").textContent = buscando ? "“" + estado.q.trim() + "”" : ep.id;
-  $("#subtitulo").textContent = buscando
-    ? visibles.length + (visibles.length===1 ? " palabra" : " palabras") + " en las 10 temporadas"
-    : visibles.length + " de " + ep.c + " palabras · T" + ep.t + " E" + ep.n;
+  $("#titulo").textContent = ep.id;
+  $("#subtitulo").textContent =
+    visibles.length + " de " + ep.c + " palabras · T" + ep.t + " E" + ep.n;
 
   topeFrec = Math.max(1, ...visibles.map(o => o.f));
   cont.innerHTML = "";
   pintadas = 0;
   if(!visibles.length){
     cont.innerHTML = '<p class="aviso"><b>Ningún resultado</b>' +
-      "Prueba a quitar algún filtro o a buscar otra palabra.</p>";
+      "Prueba a quitar alguno de los filtros activos.</p>";
     return;
   }
   pintarTanda();
 }
 
 /* ---------- eventos ---------- */
-let temporizador;
-$("#q").addEventListener("input", e => {
-  estado.q = e.target.value;
-  clearTimeout(temporizador);
-  temporizador = setTimeout(refrescar, 120);      /* evita recalcular en cada tecla */
-});
 $("#orden").addEventListener("change", e => { estado.orden = e.target.value; refrescar(); });
+$("#vel").addEventListener("change", e => {
+  velocidad = parseFloat(e.target.value);
+  try{ localStorage.setItem("velocidad", e.target.value); }catch(err){}
+});
+$("#rep").addEventListener("change", e => {
+  repeticiones = parseInt(e.target.value, 10);
+  try{ localStorage.setItem("repeticiones", e.target.value); }catch(err){}
+});
 $("#cat").addEventListener("change",   e => { estado.cat   = e.target.value; refrescar(); });
 [["#f-nuevas","nuevas"],["#f-col","col"],["#f-ext","ext"]].forEach(par => {
   $(par[0]).addEventListener("click", e => {
@@ -537,7 +579,6 @@ document.addEventListener("keydown", e => {
     if(e.key==="Escape") e.target.blur();
     return;
   }
-  if(e.key==="/"){ e.preventDefault(); $("#q").focus(); return; }
   const k = EPS.findIndex(x=>x.id===estado.ep);
   if(e.key==="ArrowRight" && k<EPS.length-1) irA(EPS[k+1].id);
   if(e.key==="ArrowLeft"  && k>0)            irA(EPS[k-1].id);
@@ -550,6 +591,53 @@ if("IntersectionObserver" in window){
 addEventListener("hashchange", () => {
   const e = EPS.find(x=>x.id===location.hash.slice(1));
   if(e && e.id!==estado.ep) irA(e.id);
+});
+
+function pintarTema(){
+  const manual = document.documentElement.dataset.tema;
+  const oscuro = manual
+    ? manual === "oscuro"
+    : matchMedia("(prefers-color-scheme: dark)").matches;
+  $("#tema").textContent = oscuro ? "☀" : "☾";
+  $("#tema").setAttribute("aria-label", oscuro ? "Cambiar a tema claro" : "Cambiar a tema oscuro");
+}
+$("#tema").addEventListener("click", () => {
+  const manual = document.documentElement.dataset.tema;
+  const oscuroAhora = manual
+    ? manual === "oscuro"
+    : matchMedia("(prefers-color-scheme: dark)").matches;
+  const nuevo = oscuroAhora ? "claro" : "oscuro";
+  document.documentElement.dataset.tema = nuevo;
+  try{ localStorage.setItem("tema", nuevo); }catch(err){}
+  pintarTema();
+});
+try{
+  const v = localStorage.getItem("velocidad");
+  if(v){ velocidad = parseFloat(v); $("#vel").value = v; }
+  const r = localStorage.getItem("repeticiones");
+  if(r){ repeticiones = parseInt(r, 10); $("#rep").value = r; }
+}catch(err){}
+pintarTema();
+
+/* ---------- gatos ---------- */
+let capaGatos = null, tempGatos, tempSalida;
+$("#miau").addEventListener("click", () => {
+  clearTimeout(tempGatos); clearTimeout(tempSalida);
+  if(!capaGatos){
+    capaGatos = document.createElement("div");
+    capaGatos.className = "gatos";
+    capaGatos.setAttribute("aria-hidden", "true");
+    const img = document.createElement("img");
+    img.src = "datos/miau.webp";          /* se pide solo al pulsar */
+    img.alt = "";
+    capaGatos.appendChild(img);
+  }
+  capaGatos.classList.remove("yendose");
+  document.body.appendChild(capaGatos);
+  tempGatos = setTimeout(() => {
+    capaGatos.classList.add("yendose");
+    tempSalida = setTimeout(() => capaGatos.remove(), 350);
+  }, 2000);
 });
 
 /* ---------- arranque ---------- */
