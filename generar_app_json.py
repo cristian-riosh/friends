@@ -80,8 +80,8 @@ try{ var t = localStorage.getItem("tema");
   --fondo:#F4F2F7; --superficie:#FFFFFF; --superficie-2:#FAF8FC;
   --tinta:#1E1723; --ciruela:#3E2A4E; --ciruela-viva:#6B4A82;
   --acento:#B96E04; --verde:#186349; --tenue:#786D85; --linea:#E3DEE9;
-  --sombra:0 1px 2px rgba(30,23,35,.05), 0 8px 24px -12px rgba(30,23,35,.18);
-  --radio:14px;
+  --sombra:0 1px 2px rgba(30,23,35,.04), 0 12px 32px -14px rgba(62,42,78,.22);
+  --radio:20px;
   --display:"Bricolage Grotesque",system-ui,sans-serif;
   --texto:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
   --dato:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
@@ -103,12 +103,16 @@ try{ var t = localStorage.getItem("tema");
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--fondo);color:var(--tinta);
+body{margin:0;color:var(--tinta);
+  background:radial-gradient(900px 420px at 85% -80px,color-mix(in srgb,var(--ciruela-viva) 14%,transparent),transparent 70%),var(--fondo);
+  background-repeat:no-repeat;background-attachment:fixed;
   font-family:var(--texto);font-size:clamp(14px,.35vw + 13px,16px);line-height:1.55;
   -webkit-font-smoothing:antialiased}
 
 /* ---------- cabecera ---------- */
-.cabecera{position:sticky;top:0;z-index:30;background:var(--ciruela);color:#F7F2FA;
+.cabecera{position:sticky;top:0;z-index:30;color:#F7F2FA;border-radius:0 0 22px 22px;
+  background:linear-gradient(135deg,var(--ciruela),color-mix(in srgb,var(--ciruela-viva) 38%,var(--ciruela)));
+  box-shadow:0 10px 30px -18px rgba(30,23,35,.55);
   padding:16px max(16px,env(safe-area-inset-left)) 16px max(16px,env(safe-area-inset-right))}
 .cabecera-in{max-width:1320px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .marca{font-family:var(--display);font-weight:800;font-size:clamp(23px,1.8vw + 18px,32px);
@@ -140,10 +144,10 @@ body{margin:0;background:var(--fondo);color:var(--tinta);
 }
 .temp{flex:0 0 auto;scroll-snap-align:start;appearance:none;border:1px solid var(--linea);
   background:var(--superficie);color:var(--tinta);border-radius:999px;
-  padding:8px 14px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap;
+  padding:9px 16px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap;
   display:flex;align-items:center;gap:8px;transition:background .15s,color .15s,border-color .15s}
 @media (min-width:900px){
-  .temp{border-radius:10px;justify-content:space-between;padding:11px 13px;font-size:14px;
+  .temp{border-radius:14px;justify-content:space-between;padding:11px 14px;font-size:14px;
     border-color:transparent;background:transparent;width:100%}
   .temp:hover{background:var(--superficie)}
   .larga{display:inline}
@@ -153,7 +157,8 @@ body{margin:0;background:var(--fondo);color:var(--tinta);
 .larga{display:none}
 .corta{display:inline}
 .temp i{font-family:var(--dato);font-size:11px;font-style:normal;opacity:.55}
-.temp[aria-current="true"]{background:var(--tinta);color:var(--fondo);border-color:var(--tinta)}
+.temp[aria-current="true"]{background:var(--tinta);color:var(--fondo);border-color:var(--tinta);
+  box-shadow:0 8px 18px -10px var(--tinta)}
 .temp[aria-current="true"] i{opacity:.75}
 
 /* ---------- rejilla de episodios ---------- */
@@ -161,28 +166,29 @@ body{margin:0;background:var(--fondo);color:var(--tinta);
   grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
 @media (min-width:600px){.rejilla{grid-template-columns:repeat(auto-fill,minmax(52px,1fr))}}
 .epi{position:relative;overflow:hidden;aspect-ratio:1/.86;min-height:44px;
-  border:1px solid var(--linea);background:var(--superficie);border-radius:11px;cursor:pointer;
+  border:1px solid var(--linea);background:var(--superficie);border-radius:14px;cursor:pointer;
   color:var(--tinta);font-family:var(--dato);font-size:13px;padding:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
   transition:transform .14s cubic-bezier(.2,.8,.3,1),border-color .14s,box-shadow .14s}
 .epi .relleno{position:absolute;inset:auto 0 0 0;background:var(--ciruela-viva);opacity:.13}
 .epi span,.epi u{position:relative}
 .epi u{text-decoration:none;font-size:9.5px;opacity:.5}
-.epi:hover{transform:translateY(-2px);border-color:var(--ciruela-viva);box-shadow:var(--sombra)}
-.epi[aria-current="true"]{background:var(--tinta);color:var(--fondo);border-color:var(--tinta)}
+.epi:hover{transform:translateY(-3px);border-color:var(--ciruela-viva);box-shadow:var(--sombra)}
+.epi[aria-current="true"]{background:var(--tinta);color:var(--fondo);border-color:var(--tinta);
+  box-shadow:0 8px 18px -10px var(--tinta)}
 .epi[aria-current="true"] .relleno{background:var(--acento);opacity:.5}
 
 /* ---------- barra de controles ---------- */
 .controles{position:sticky;top:78px;z-index:20;margin:0 -4px 16px;padding:10px 4px;
   background:var(--fondo)}
 @media (min-width:760px){
-  .controles{background:color-mix(in srgb,var(--fondo) 88%,transparent);backdrop-filter:blur(12px)}
+  .controles{background:color-mix(in srgb,var(--fondo) 72%,transparent);backdrop-filter:blur(16px) saturate(1.4)}
 }
 @supports not (backdrop-filter:blur(1px)){.controles{background:var(--fondo)}}
 .fila{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 select,.chip{min-height:40px;border:1px solid var(--linea);border-radius:999px;background:var(--superficie);
   color:var(--tinta);font:inherit;font-size:13px;padding:0 14px;cursor:pointer}
-select{border-radius:12px;padding:0 10px}
+select{border-radius:14px;padding:0 12px}
 /* Los filtros son conmutadores, no selectores: llevan un punto que se enciende.
    Además parten de un fondo un punto más hundido, para que se lean como un grupo aparte. */
 .chip{display:inline-flex;align-items:center;gap:8px;padding:0 15px 0 12px;
@@ -202,7 +208,7 @@ select{border-radius:12px;padding:0 10px}
 /* ---------- panel de resultados ---------- */
 .panel{background:var(--superficie);border:1px solid var(--linea);border-radius:var(--radio);
   box-shadow:var(--sombra);overflow:hidden}
-.titulo{padding:14px 16px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+.titulo{padding:18px 20px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
   border-bottom:1px solid var(--linea)}
 .titulo h2{font-family:var(--display);font-size:clamp(17px,1.1vw + 14px,20px);margin:0;font-weight:700}
 .titulo .sub{font-family:var(--dato);font-size:12px;color:var(--tenue)}
@@ -213,12 +219,12 @@ select{border-radius:12px;padding:0 10px}
   .encabezados,.entrada{display:grid;
     grid-template-columns:minmax(170px,1.1fr) minmax(130px,.7fr) minmax(190px,1.5fr) 96px;
     gap:16px;align-items:start}
-  .encabezados{padding:9px 16px;border-bottom:1px solid var(--linea)}
+  .encabezados{padding:10px 20px;border-bottom:1px solid var(--linea);background:var(--superficie-2)}
   .encabezados span{font-family:var(--dato);font-size:10.5px;text-transform:uppercase;
     letter-spacing:.07em;color:var(--tenue)}
   .encabezados span:last-child,.c-frec{text-align:right}
 }
-.entrada{padding:12px 16px;border-bottom:1px solid var(--linea)}
+.entrada{padding:14px 20px;border-bottom:1px solid var(--linea);transition:background .15s}
 .entrada:last-child{border-bottom:0}
 @media (hover:hover){.entrada:hover{background:var(--superficie-2)}}
 .lema{font-family:var(--display);font-weight:700;font-size:clamp(16px,.6vw + 15px,18px);
@@ -237,13 +243,13 @@ select{border-radius:12px;padding:0 10px}
 .c-frec{font-family:var(--dato);font-size:12.5px;color:var(--tenue);margin-top:6px}
 @media (min-width:760px){.c-frec{margin-top:2px}}
 .c-frec b{color:var(--tinta);font-weight:500;font-size:14px}
-.barra{display:block;height:3px;background:var(--acento);border-radius:2px;margin-top:5px;
+.barra{display:block;height:4px;background:linear-gradient(90deg,var(--acento),color-mix(in srgb,var(--acento) 45%,transparent));border-radius:2px;margin-top:5px;
   min-width:3px;opacity:.7}
 @media (max-width:759px){.barra{display:none}}
 
 /* botón de pronunciación */
 .decir{flex:0 0 auto;appearance:none;border:1px solid var(--linea);background:var(--superficie-2);
-  width:32px;height:32px;border-radius:50%;cursor:pointer;color:var(--ciruela-viva);
+  width:34px;height:34px;border-radius:50%;cursor:pointer;color:var(--ciruela-viva);
   font-size:11px;line-height:1;padding:0;display:grid;place-items:center;
   transition:background .15s,color .15s,transform .1s}
 @media (pointer:coarse){.decir{width:40px;height:40px;font-size:13px}}
@@ -404,6 +410,43 @@ function cargarVoces(){ voces = sintesis ? sintesis.getVoices() : []; }
 if(sintesis){ cargarVoces(); sintesis.addEventListener?.("voiceschanged", cargarVoces); }
 else { document.body.classList.add("sin-voz"); }
 
+/* Calentamiento de la salida de audio: tras unos segundos en silencio, los
+   audifonos Bluetooth y el sistema "duermen" la salida y se comen el inicio de
+   la frase. Antes de sonar, si hace REPOSO ms que no suena nada, se reproduce
+   un clip casi inaudible de WARM_MS ms. Sube WARM_MS a 700 si aun se corta. */
+const WARM_MS = 350, REPOSO = 2500;
+let ultimoSonido = 0, calentando = null, urlCalentar = null;
+
+function clipCalentar(){
+  if(urlCalentar) return urlCalentar;
+  const hz = 8000, n = Math.round(hz*WARM_MS/1000);
+  const buf = new ArrayBuffer(44 + n*2), d = new DataView(buf);
+  const txt = (p, s) => { for(let i=0;i<s.length;i++) d.setUint8(p+i, s.charCodeAt(i)); };
+  txt(0,"RIFF"); d.setUint32(4, 36+n*2, true); txt(8,"WAVEfmt ");
+  d.setUint32(16,16,true); d.setUint16(20,1,true); d.setUint16(22,1,true);
+  d.setUint32(24,hz,true); d.setUint32(28,hz*2,true); d.setUint16(32,2,true); d.setUint16(34,16,true);
+  txt(36,"data"); d.setUint32(40, n*2, true);
+  /* +-1 sobre 32768: casi silencio, pero no silencio digital, que algunos dispositivos ignoran */
+  for(let i=0;i<n;i++) d.setInt16(44+i*2, i%2 ? -1 : 1, true);
+  return urlCalentar = URL.createObjectURL(new Blob([buf], {type:"audio/wav"}));
+}
+
+/* Promesa que se cumple cuando la salida ya esta despierta. Sin espera si
+   sono algo hace poco; las llamadas simultaneas comparten un solo clip. */
+function calentar(){
+  if(Date.now() - ultimoSonido < REPOSO) return Promise.resolve();
+  if(calentando) return calentando;
+  return calentando = new Promise(fin => {
+    const listo = () => { if(calentando){ calentando = null; ultimoSonido = Date.now(); } fin(); };
+    try{
+      const a = new Audio(clipCalentar());
+      a.onended = a.onerror = listo;
+      a.play().catch(listo);
+      setTimeout(listo, WARM_MS + 400);      /* red de seguridad si nunca termina */
+    }catch(e){ listo(); }
+  });
+}
+
 function pronunciar(palabra, idioma, boton){
   if(!sintesis) return;
   /* cancelar lo anterior: el token invalida las repeticiones ya programadas */
@@ -427,13 +470,14 @@ function pronunciar(palabra, idioma, boton){
     frase.rate = velocidad;
     if(voz) frase.voice = voz;
     frase.onend = frase.onerror = () => {
+      ultimoSonido = Date.now();
       if(miTurno !== tokenVoz) return;
       if(quedan > 0){ quedan--; tempVoz = setTimeout(decir, PAUSA); }
       else if(boton){ delete boton.dataset.sonando; botonActivo = null; }
     };
     sintesis.speak(frase);
   };
-  decir();
+  calentar().then(decir);
 }
 
 let EPS = [], LEX = [], DEBUT = [];
@@ -668,7 +712,8 @@ function maullar(retraso, tono){
     a.preservesPitch = a.mozPreservesPitch = a.webkitPreservesPitch = false;
     a.playbackRate = tono;                  /* al no preservar el tono, cambia el timbre */
     a.volume = 0.9;
-    setTimeout(() => { a.play().catch(() => sintetizar(0, tono)); }, retraso*1000);
+    a.onended = () => { ultimoSonido = Date.now(); };
+    setTimeout(() => { calentar().then(() => a.play()).catch(() => sintetizar(0, tono)); }, retraso*1000);
   }catch(e){ sintetizar(retraso, tono); }
 }
 
