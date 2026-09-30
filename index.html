@@ -359,7 +359,9 @@ function pronunciar(palabra, idioma, boton){
   if(boton) boton.dataset.sonando = "1";
 
   const raiz = idioma.slice(0,2);
-  const voz = voces.find(v => v.lang === idioma) || voces.find(v => v.lang.startsWith(raiz));
+  /* preferimos Andrew (Edge); su versión multilingüe lee fr/it/de/es */
+  const andrew = voces.find(v => /andrew\s?multilingual/i.test(v.name)) || voces.find(v => /andrew/i.test(v.name) && v.lang.startsWith(raiz));
+  const voz = andrew || voces.find(v => v.lang === idioma) || voces.find(v => v.lang.startsWith(raiz));
   let quedan = repeticiones;
 
   const decir = () => {
